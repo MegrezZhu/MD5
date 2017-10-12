@@ -1,0 +1,47 @@
+#pragma once
+
+#include <string>
+#include <cstdint>
+#include <array>
+
+namespace MD5 {
+	using namespace std;
+
+	typedef uint32_t Reg;
+	constexpr Reg iA = 0x67452301, iB = 0xEFCDAB89, iC = 0x98BADCFE, iD = 0x10325476; // initial value for A B C D
+	constexpr int REG_SIZE = 32; 
+	constexpr int REG_SIZE_S = REG_SIZE / 8;
+	constexpr int BLOCK_SIZE = 512;
+	constexpr int BLOCK_SIZE_S = BLOCK_SIZE / 8; // char-wise size
+	constexpr int BLOCK_LENGTH = BLOCK_SIZE / REG_SIZE; // # of Regs
+	constexpr int TAIL_LENGTH = 64;
+	constexpr int TAIL_LENGTH_S = TAIL_LENGTH / 8;
+
+	constexpr int rotate[] = {
+		7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22,
+		5,  9, 14, 20,  5,  9, 14, 20,  5,  9, 14, 20,  5,  9, 14, 20,
+		4, 11, 16, 23,  4, 11, 16, 23,  4, 11, 16, 23,  4, 11, 16, 23,
+		6, 10, 15, 21,  6, 10, 15, 21,  6, 10, 15, 21,  6, 10, 15, 21
+	};
+
+	using Block = array<Reg, BLOCK_SIZE / REG_SIZE>;
+	
+
+	class Crypto {
+		bool completed;
+		Reg a, b, c, d;
+		string left;
+		unsigned long long length;
+
+		void work(const Block &block);
+
+		void padding();
+		static Block toBlock(const string &str);
+		static string toHex(Reg r);
+		static Reg rotateLeft(Reg r, int count);
+	public:
+		Crypto();
+		void update(const string &data = "");
+		string digest(const string &data = "");
+	};
+}
