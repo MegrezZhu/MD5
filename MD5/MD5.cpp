@@ -85,6 +85,7 @@ namespace MD5 {
 
 	string Crypto::digest(const string &data) {
 		checkCompleted();
+
 		left.append(data);
 		length += data.length();
 		padding();
@@ -108,7 +109,12 @@ namespace MD5 {
 		assert(str.length() == BLOCK_SIZE_S);
 		Block block;
 		for (int i = 0; i < BLOCK_LENGTH; i++) {
-			block[i] = combine(charExtension(str[i * 4]), charExtension(str[i * 4 + 1]), charExtension(str[i * 4 + 2]), charExtension(str[i * 4 + 3]));
+			block[i] = combine(
+				charExtension(str[i * 4]),
+				charExtension(str[i * 4 + 1]),
+				charExtension(str[i * 4 + 2]),
+				charExtension(str[i * 4 + 3])
+			);
 		}
 		return block;
 	}
@@ -118,7 +124,6 @@ namespace MD5 {
 	}
 
 	Reg Crypto::charExtension(char c) {
-		Reg r = c;
-		return r & 0b11111111u;
+		return Reg(c) & 0b11111111u;
 	}
 }
